@@ -1,94 +1,119 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Anime Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Anime-style font -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: radial-gradient(circle at top, #2a003d, #0b0015);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Orbitron', sans-serif;
-      color: white;
-      overflow: hidden;
-    }
-
-    .glow {
-      position: absolute;
-      width: 350px;
-      height: 350px;
-      background: #ff2cdf;
-      filter: blur(120px);
-      opacity: 0.3;
-    }
-
-    .card {
-      width: 360px;
-      padding: 35px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 20px;
-      backdrop-filter: blur(12px);
-      text-align: center;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.7);
-      transition: transform 0.4s ease;
-      transform-style: preserve-3d;
-    }
-
-    .card:hover {
-      transform: rotateX(10deg) rotateY(-10deg) scale(1.05);
-    }
-
-    h1 {
-      color: #ff2cdf;
-      text-shadow: 0 0 20px #ff2cdf;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 14px;
-      opacity: 0.85;
-      margin-bottom: 25px;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 28px;
-      border-radius: 30px;
-      text-decoration: none;
-      color: white;
-      background: linear-gradient(135deg, #ff2cdf, #6a00ff);
-      box-shadow: 0 0 25px rgba(255,44,223,0.7);
-      transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 0 40px rgba(255,44,223,1);
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Caro (HTML Only)</title>
+<style>
+body { text-align:center; font-family:Arial; background:#0b1220; color:white; }
+h2 { margin-top:10px; }
+#board {
+  display:grid;
+  grid-template-columns: repeat(15, 35px);
+  width:max-content;
+  margin:20px auto;
+}
+.cell {
+  width:35px; height:35px;
+  border:1px solid #444;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+}
+.X { color:#00eaff; }
+.O { color:#ff4d88; }
+</style>
 </head>
-
+ 
 <body>
-
-  <div class="glow"></div>
-
-  <div class="card">
-    <h1>Anime World</h1>
-    <p>Enter a futuristic anime-inspired universe</p>
-
-    <!-- Redirect Button -->
-    <a href="https://example.com" class="btn" target="_blank">
-      Enter Now
-    </a>
-  </div>
-
+ 
+<h2>Caro (HTML Only)</h2>
+<p id="status">Turn: X</p>
+ 
+<div id="board"></div>
+ 
+<button onclick="restart()">Restart</button>
+ 
+<script>
+const size = 15;
+let board = [];
+let turn = "X";
+let gameOver = false;
+ 
+const boardDiv = document.getElementById("board");
+ 
+function init() {
+  board = [];
+  boardDiv.innerHTML = "";
+  gameOver = false;
+  turn = "X";
+ 
+  for (let i=0;i<size;i++){
+    board[i] = [];
+    for (let j=0;j<size;j++){
+      board[i][j] = "";
+      let cell = document.createElement("div");
+      cell.className = "cell";
+      cell.onclick = () => move(i,j,cell);
+      boardDiv.appendChild(cell);
+    }
+  }
+ 
+  updateStatus();
+}
+ 
+function move(r,c,cell){
+  if(board[r][c] || gameOver) return;
+ 
+  board[r][c] = turn;
+  cell.textContent = turn;
+  cell.classList.add(turn);
+ 
+  if(checkWin(r,c)){
+    document.getElementById("status").innerText = turn + " wins!";
+    gameOver = true;
+    return;
+  }
+ 
+  turn = (turn==="X") ? "O" : "X";
+  updateStatus();
+}
+ 
+function updateStatus(){
+  document.getElementById("status").innerText = "Turn: " + turn;
+}
+ 
+function checkWin(r,c){
+  function count(dx,dy){
+    let cnt=0;
+    let x=r, y=c;
+ 
+    while(board[x] && board[x][y]===turn){
+      cnt++; x+=dx; y+=dy;
+    }
+ 
+    x=r-dx; y=c-dy;
+    while(board[x] && board[x][y]===turn){
+      cnt++; x-=dx; y-=dy;
+    }
+    return cnt;
+  }
+ 
+  return (
+    count(1,0)>=5 ||
+    count(0,1)>=5 ||
+    count(1,1)>=5 ||
+    count(1,-1)>=5
+  );
+}
+ 
+function restart(){
+  init();
+}
+ 
+init();
+</script>
+ 
 </body>
 </html>
